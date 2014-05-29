@@ -1,0 +1,9 @@
+@import "addons.scss";
+@import "tdb_choco.scss";
+
+/* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
+/* The actual styles should be defined in tdb_choco.scss */
+.tdb_choco {
+  @include addons;
+  @include tdb_choco;
+}
