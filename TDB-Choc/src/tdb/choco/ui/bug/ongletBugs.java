@@ -31,6 +31,7 @@ public class ongletBugs extends CustomComponent {
             cn = DriverManager.getConnection(url, login, passwrd);
 
             st = cn.createStatement();
+            // Requête exemple
             String sql = "SELECT * FROM solvers";
 
             rs = st.executeQuery(sql);
@@ -62,6 +63,7 @@ public class ongletBugs extends CustomComponent {
 
         table.addItem(new Object[] { "Solving_Time < 90000 et pas de solution",
                 "", "" }, new Integer(1));
+        // Tableau recevant la requête exemple
         for (int i = 2; i < 2 + nomBenchmarks.size(); i++) {
             table.addItem(new Object[] { "", nomBenchmarks.get(i - 2), "" },
                     new Integer(i));
