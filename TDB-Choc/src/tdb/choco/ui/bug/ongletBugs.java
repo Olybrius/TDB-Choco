@@ -22,10 +22,10 @@ public class ongletBugs extends CustomComponent {
     ResultSet rs = null;
     List<String> nomProblemes1D = new ArrayList<String>();
     List<String> nomProblemes1AD = new ArrayList<String>();
-    List<String> nomBenchmarks2 = new ArrayList<String>();
-    List<String> nomProblemes2 = new ArrayList<String>();
-    List<String> nomBenchmarks3 = new ArrayList<String>();
-    List<String> nomProblemes3 = new ArrayList<String>();
+    List<String> nomProblemes2AD = new ArrayList<String>();
+    List<String> nomProblemes2D = new ArrayList<String>();
+    List<String> nomProblemes3D = new ArrayList<String>();
+    List<String> nomProblemes3AD = new ArrayList<String>();
     String dernierBenchmark, avantDernierBenchmark;
 
     public ongletBugs() {
@@ -74,34 +74,58 @@ public class ongletBugs extends CustomComponent {
             // *************AU DESSUS CA MARCHE !!!!!!****************
 
             // Requête valeur exceptionnelle pour récupérer le nom du problème
+            // avec le dernier benchmark
+            // String soustraction =
+            // "SELECT p.objective-r.objective FROM problems p, resolutions r WHERE r.nb_sol<>0 AND p.pid=r.pid";
+            // String objectiveProbleme =
+            // "SELECT objective, pid, name FROM problems";
+            // String objectiveResolutionsAD =
+            // "SELECT objective, pid FROM resolutions WHERE nb_sol<>0 AND bid = "
+            // + avantDernierBID;
+            // String objectiveResolutionsD =
+            // "SELECT objective, pid FROM resolutions WHERE nb_sol<>0 AND bid = "
+            // + dernierBID;
+            //
+            // String nomProbleme2AD =
+            // "Select p.name FROM problems p, resolutions r "
+            // + "WHERE bid = "
+            // + avantDernierBID
+            // + " AND nb_sol<>0 AND p.pid=r.pid AND p.objective<>r.objective";
+            // rs = st.executeQuery(nomProbleme2AD);
+            // while (rs.next()) {
+            // nomProblemes2.add(rs.getString("name"));
+            // }
+            //
+            // // Requête valeur exceptionnelle pour récupérer le nom du
+            // problème
+            // // avec l'avant dernier benchmark
+            // String nomBenchmark2 =
+            // "Select b.name FROM benchmarks b, resolutions r WHERE b.bid=r.bid AND b.objective=r.objective";
+            // rs = st.executeQuery(nomBenchmark2);
+            // while (rs.next()) {
+            // nomBenchmarks2.add(rs.getString("name"));
+            // }
 
-            String nomProbleme2 = "Select p.name FROM problems p, resolutions r WHERE p.pid=r.pid AND p.objective=r.objective";
-            rs = st.executeQuery(nomProbleme2);
+            // *****Voir pour faire soustration au-dessus !!!!!!*********
+
+            // Requête Solving_time < 900000 et pas la meilleure solution pour
+            // récupérer le nom du problème avec l'avant dernier benchmark
+            String nomProbleme3AD = "SELECT p.name FROM problems p, resolutions r WHERE bid = "
+                    + avantDernierBID
+                    + " AND r.solving_time<900000 AND r.pid=p.pid AND nb_sol<> 0 AND p.objective<>r.objective ";
+            rs = st.executeQuery(nomProbleme3AD);
             while (rs.next()) {
-                nomProblemes2.add(rs.getString("name"));
+                nomProblemes3AD.add(rs.getString("name"));
             }
 
-            // Requête valeur exceptionnelle pour récupérer le nom du benchmark
-            String nomBenchmark2 = "Select b.name FROM benchmarks b, resolutions r WHERE b.bid=r.bid AND b.objective=r.objective";
-            rs = st.executeQuery(nomBenchmark2);
+            // Requête Solving_time < 900000 et pas la meilleure solution pour
+            // récupérer le nom du problème avec le dernier benchmark
+            String nomProbleme3D = "SELECT p.name FROM problems p, resolutions r WHERE bid = "
+                    + dernierBID
+                    + " AND r.solving_time<900000 AND r.pid=p.pid AND nb_sol<> 0 AND p.objective<>r.objective";
+            rs = st.executeQuery(nomProbleme3D);
             while (rs.next()) {
-                nomBenchmarks2.add(rs.getString("name"));
-            }
-
-            // Requête Solving_time < 900000 et pas de solution pour récupérer
-            // le nom du problème
-            String nomProbleme3 = "Select p.name FROM problems p, resolutions r WHERE p.resolutions='min' OR p.resolutions='max' AND r.solving_time<900000 AND r.pid=p.pid AND r.objective!=p.objective";
-            rs = st.executeQuery(nomProbleme3);
-            while (rs.next()) {
-                nomProblemes3.add(rs.getString("name"));
-            }
-
-            // Requête Solving_time < 900000 et pas de solution pour récupérer
-            // le nom du benchmark
-            String nomBenchmark3 = "Select b.name FROM problems p, resolutions r, benchmarks b WHERE p.resolutions='min' OR p.resolutions='max' AND r.solving_time<900000 AND r.bid=b.bid AND r.objective!=p.objective";
-            rs = st.executeQuery(nomBenchmark3);
-            while (rs.next()) {
-                nomBenchmarks3.add(rs.getString("name"));
+                nomProblemes3D.add(rs.getString("name"));
             }
 
         } catch (SQLException se) {
@@ -118,10 +142,12 @@ public class ongletBugs extends CustomComponent {
         }
 
         final VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
         layout.setMargin(true);
 
         Table table = new Table("Bugs");
         table.setSortEnabled(false);
+        table.setSizeFull();
         table.addContainerProperty("Type du bug", String.class, null);
         table.addContainerProperty("Nom du Benchmark", String.class, null);
         table.addContainerProperty("Nom du Problème", String.class, null);
@@ -145,7 +171,17 @@ public class ongletBugs extends CustomComponent {
 
         table.addItem(new Object[] {
                 "Solving_Time < 90000 et pas la meilleure solution (MIN, MAX)",
-                "", "" }, new Integer(3000));
+                "", "" }, new Integer(4000));
+        for (int i = 4001; i < 4001 + nomProblemes3AD.size(); i++) {
+            table.addItem(new Object[] { "", avantDernierBenchmark,
+                    nomProblemes3AD.get(i - 4001) }, new Integer(i));
+        }
+
+        for (int i = 5000; i < 5000 + nomProblemes3D.size(); i++) {
+            table.addItem(
+                    new Object[] { "", dernierBenchmark,
+                            nomProblemes3D.get(i - 5000) }, new Integer(i));
+        }
 
         layout.addComponent(table);
 
